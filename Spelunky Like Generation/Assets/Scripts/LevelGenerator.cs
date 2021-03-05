@@ -14,6 +14,7 @@ public class LevelGenerator : MonoBehaviour
 
     private int direction;
     private int roomIndex;
+    private int lastRoomIndex;
     private bool firstTime = true;
     [SerializeField]
     private bool skipRoom = false;
@@ -48,7 +49,7 @@ public class LevelGenerator : MonoBehaviour
             // Move Down
             if (firstTime)
             {
-                if (rooms[roomIndex].CompareTag("BottomExit") || startingRooms[roomIndex].CompareTag("BottomExit"))
+                if (rooms[lastRoomIndex].CompareTag("BottomExit") || startingRooms[lastRoomIndex].CompareTag("BottomExit"))
                 {
                     Vector2 newPosition = new Vector2(transform.position.x, transform.position.y - moveAmount);
                     transform.position = newPosition;
@@ -76,8 +77,14 @@ public class LevelGenerator : MonoBehaviour
         }
 
         Collider2D collider = gameObject.GetComponent<Collider2D>();
-        skipRoom = collider.IsTouchingLayers();
+        Collider2D collidedCollider = Physics2D.OverlapCircle(collider.transform.position, 3);
 
+        if (collidedCollider != null && collidedCollider.gameObject.GetComponent<ExtraTags>().tags.Contains("Room"))
+        {
+            skipRoom = true;
+        }
+
+        lastRoomIndex = roomIndex;
         roomIndex = Random.Range(0, rooms.Length);
 
         firstTime = false;
@@ -93,17 +100,9 @@ public class LevelGenerator : MonoBehaviour
         direction = Random.Range(1, 6);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.GetComponent<ExtraTags>().tags.Contains("Room"))
-        {
-            //skipRoom = true;
-        }
-    }
-
     private void checkForDownPlacement()
     {
-        if (rooms[roomIndex].CompareTag("BottomExit"))
+        if (rooms[lastRoomIndex].CompareTag("BottomExit"))
         {
             Vector2 newPosition = new Vector2(transform.position.x, transform.position.y - moveAmount);
             transform.position = newPosition;
