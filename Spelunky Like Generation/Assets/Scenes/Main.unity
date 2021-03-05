@@ -461,7 +461,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 879068363}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.433837, y: 0.2240566, z: -37.82004}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -494,6 +494,9 @@ MonoBehaviour:
   - {fileID: 2682907625850496950, guid: e88d15055f799d043b1df5e893211374, type: 3}
   moveAmount: 10
   timeBetweenSpawns: 0.25
+  maxX: 5
+  minX: -25
+  layer: 1
   skipRoom: 0
 --- !u!58 &879068366
 CircleCollider2D:

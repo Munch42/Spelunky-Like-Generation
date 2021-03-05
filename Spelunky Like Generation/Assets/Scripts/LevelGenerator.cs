@@ -11,6 +11,11 @@ public class LevelGenerator : MonoBehaviour
     public float moveAmount;
     private float currentTimeBetweenRooms;
     public float timeBetweenSpawns = 0.25f;
+    public float maxX = 5f;
+    public float minX = -25f;
+    // Layers go between 1 and 4
+    // 1 is the top while 4 is the bottom
+    public int layer = 1;
 
     private int direction;
     private int roomIndex;
@@ -18,6 +23,11 @@ public class LevelGenerator : MonoBehaviour
     private bool firstTime = true;
     [SerializeField]
     private bool skipRoom = false;
+
+    private List<int> bottomRoomIndices = new List<int>();
+    private List<int> topRoomIndices = new List<int>();
+
+    private bool topRoomNeeded = false;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +40,17 @@ public class LevelGenerator : MonoBehaviour
         roomIndex = randomStartingRoom;
 
         direction = Random.Range(1, 6);
+
+        for (int i = 0; i < rooms.Length; i++)
+        {
+            if (rooms[i].CompareTag("BottomExit"))
+            {
+                bottomRoomIndices.Add(i);
+            } else if (rooms[i].GetComponent<ExtraTags>().tags.Contains("TopExit"))
+            {
+                topRoomIndices.Add(i);
+            }
+        }
     }
 
     private void Move()
@@ -74,6 +95,13 @@ public class LevelGenerator : MonoBehaviour
             {
                 checkForDownPlacement();
             }
+        } else if (direction == 6)
+        {
+            // Force Move Down
+            // For the direction to be this, the above room must be a down room so this must be an up room of some kind
+            Vector2 newPosition = new Vector2(transform.position.x, transform.position.y - moveAmount);
+            transform.position = newPosition;
+            topRoomNeeded = true;
         }
 
         Collider2D collider = gameObject.GetComponent<Collider2D>();
@@ -89,6 +117,28 @@ public class LevelGenerator : MonoBehaviour
 
         firstTime = false;
 
+        direction = Random.Range(1, 6);
+
+        if (transform.position.x >= maxX || transform.position.x <= minX)
+        {
+            roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+            direction = 6;
+        }
+
+        if (topRoomNeeded)
+        {
+            topRoomNeeded = false;
+            roomIndex = topRoomIndices[Random.Range(0, topRoomIndices.Count)];
+            
+            if(transform.position.x >= maxX)
+            {
+                direction = 3;
+            } else
+            {
+                direction = 1;
+            }
+        }
+
         if (!skipRoom)
         {
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
@@ -96,8 +146,6 @@ public class LevelGenerator : MonoBehaviour
         {
             skipRoom = false;
         }
-
-        direction = Random.Range(1, 6);
     }
 
     private void checkForDownPlacement()

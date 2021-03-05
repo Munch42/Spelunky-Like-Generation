@@ -776,6 +776,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags:
   - Room
+  - TopExit
 --- !u!1 &1854717420616983838
 GameObject:
   m_ObjectHideFlags: 0
