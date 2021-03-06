@@ -61,6 +61,8 @@ public class LevelGenerator : MonoBehaviour
     {
         Vector2 lastPosition = transform.position;
 
+        Debug.Log("New Room: " + direction);
+
         if (direction == 1 || direction == 2)
         {
             // Move Right
@@ -115,7 +117,7 @@ public class LevelGenerator : MonoBehaviour
 
         if (collidedCollider != null && collidedCollider.gameObject.GetComponent<ExtraTags>().tags.Contains("Room"))
         {
-            skipRoom = true;
+            //skipRoom = true;
         } 
 
         lastRoomIndex = roomIndex;
@@ -127,19 +129,24 @@ public class LevelGenerator : MonoBehaviour
 
         if (transform.position.x == maxX || transform.position.x == minX)
         {
+            Debug.Log("2: " + rooms[roomIndex].name + roomIndex + " | " + direction);
             roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
             direction = 6;
+            Debug.Log("3: " + roomIndex + " | " + direction);
         } else if(transform.position.x > maxX || transform.position.x < minX)
         {
+            Debug.Log("4: " + roomIndex + " | " + direction);
             transform.position = lastPosition;
             Collider2D[] lastRooms = Physics2D.OverlapCircleAll(transform.position, 3);
             Destroy(lastRooms[1].gameObject);
             roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
             direction = 6;
+            Debug.Log("5: " + roomIndex + " | " + direction);
         }
 
         if (topRoomNeeded)
         {
+            Debug.Log("6: " + roomIndex + " | " + direction);
             Debug.Log("top room was needed");
             topRoomNeeded = false;
             roomIndex = topRoomIndices[Random.Range(0, topRoomIndices.Count)];
@@ -151,10 +158,12 @@ public class LevelGenerator : MonoBehaviour
             {
                 direction = 1;
             }
+            Debug.Log("7: " + roomIndex + " | " + direction);
         }
 
         if (topRoomNeeded && direction == 6)
         {
+            Debug.Log("8: " + roomIndex + " | " + direction);
             topRoomNeeded = false;
             roomIndex = topBottomRoomIndices[Random.Range(0, topBottomRoomIndices.Count)];
 
@@ -166,6 +175,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 direction = 1;
             }
+            Debug.Log("9: " + roomIndex + " | " + direction);
         }
 
         if (bottomRoomIndices.Contains(roomIndex) && transform.position.y == -15 && !skipRoom)
@@ -174,17 +184,20 @@ public class LevelGenerator : MonoBehaviour
             generationDone = true;
         } else if(transform.position.y < -15)
         {
+            Debug.Log("10: " + roomIndex + " | " + direction);
             generationDone = true;
             transform.position = lastPosition;
             Collider2D[] lastRooms = Physics2D.OverlapCircleAll(transform.position, 3);
             Destroy(lastRooms[1].gameObject);
             roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+            Debug.Log("11: " + roomIndex + " | " + direction);
         }
 
         if (!skipRoom)
         {
             //GameObject room = Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
 
+            Debug.Log("Final: " + roomIndex + " | " + direction);
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
         } else
         {
