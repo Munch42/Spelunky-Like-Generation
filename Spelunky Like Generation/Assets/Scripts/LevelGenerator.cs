@@ -61,7 +61,7 @@ public class LevelGenerator : MonoBehaviour
     {
         Vector2 lastPosition = transform.position;
 
-        Debug.Log("New Room: " + direction);
+        Debug.LogWarning("New Room: " + direction);
 
         if (direction == 1 || direction == 2)
         {
@@ -117,7 +117,7 @@ public class LevelGenerator : MonoBehaviour
 
         if (collidedCollider != null && collidedCollider.gameObject.GetComponent<ExtraTags>().tags.Contains("Room"))
         {
-            //skipRoom = true;
+            skipRoom = true;
         } 
 
         lastRoomIndex = roomIndex;
@@ -149,7 +149,11 @@ public class LevelGenerator : MonoBehaviour
             Debug.Log("6: " + roomIndex + " | " + direction);
             Debug.Log("top room was needed");
             topRoomNeeded = false;
-            roomIndex = topRoomIndices[Random.Range(0, topRoomIndices.Count)];
+
+            if (!rooms[roomIndex].GetComponent<ExtraTags>().tags.Contains("TopExit"))
+            {
+                roomIndex = topRoomIndices[Random.Range(0, topRoomIndices.Count)];
+            }
             
             if(transform.position.x >= maxX)
             {
@@ -197,10 +201,11 @@ public class LevelGenerator : MonoBehaviour
         {
             //GameObject room = Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
 
-            Debug.Log("Final: " + roomIndex + " | " + direction);
+            Debug.Log("Final: " + rooms[roomIndex].name + roomIndex + " | " + direction);
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
         } else
         {
+            direction = Random.Range(1, 5);
             skipRoom = false;
         }
     }
