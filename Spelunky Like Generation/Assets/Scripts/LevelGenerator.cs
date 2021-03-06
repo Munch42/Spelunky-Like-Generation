@@ -13,19 +13,20 @@ public class LevelGenerator : MonoBehaviour
     public float timeBetweenSpawns = 0.25f;
     public float maxX = 5f;
     public float minX = -25f;
-    // Layers go between 1 and 4
-    // 1 is the top while 4 is the bottom
-    public int layer = 1;
 
     private int direction;
+    [SerializeField]
     private int roomIndex;
     private int lastRoomIndex;
     private bool firstTime = true;
     [SerializeField]
     private bool skipRoom = false;
+    private bool generationDone = false;
 
+    [SerializeField]
     private List<int> bottomRoomIndices = new List<int>();
     private List<int> topRoomIndices = new List<int>();
+    private List<int> topBottomRoomIndices = new List<int>();
 
     private bool topRoomNeeded = false;
 
@@ -49,12 +50,17 @@ public class LevelGenerator : MonoBehaviour
             } else if (rooms[i].GetComponent<ExtraTags>().tags.Contains("TopExit"))
             {
                 topRoomIndices.Add(i);
+            } else if (rooms[i].GetComponent<ExtraTags>().tags.Contains("TopBottomExit"))
+            {
+                topBottomRoomIndices.Add(i);
             }
         }
     }
 
     private void Move()
     {
+        Vector2 lastPosition = transform.position;
+
         if (direction == 1 || direction == 2)
         {
             // Move Right
@@ -110,7 +116,7 @@ public class LevelGenerator : MonoBehaviour
         if (collidedCollider != null && collidedCollider.gameObject.GetComponent<ExtraTags>().tags.Contains("Room"))
         {
             skipRoom = true;
-        }
+        } 
 
         lastRoomIndex = roomIndex;
         roomIndex = Random.Range(0, rooms.Length);
@@ -119,14 +125,22 @@ public class LevelGenerator : MonoBehaviour
 
         direction = Random.Range(1, 6);
 
-        if (transform.position.x >= maxX || transform.position.x <= minX)
+        if (transform.position.x == maxX || transform.position.x == minX)
         {
+            roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+            direction = 6;
+        } else if(transform.position.x > maxX || transform.position.x < minX)
+        {
+            transform.position = lastPosition;
+            Collider2D[] lastRooms = Physics2D.OverlapCircleAll(transform.position, 3);
+            Destroy(lastRooms[1].gameObject);
             roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
             direction = 6;
         }
 
         if (topRoomNeeded)
         {
+            Debug.Log("top room was needed");
             topRoomNeeded = false;
             roomIndex = topRoomIndices[Random.Range(0, topRoomIndices.Count)];
             
@@ -139,8 +153,38 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        if (topRoomNeeded && direction == 6)
+        {
+            topRoomNeeded = false;
+            roomIndex = topBottomRoomIndices[Random.Range(0, topBottomRoomIndices.Count)];
+
+            if (transform.position.x >= maxX)
+            {
+                direction = 3;
+            }
+            else
+            {
+                direction = 1;
+            }
+        }
+
+        if (bottomRoomIndices.Contains(roomIndex) && transform.position.y == -15 && !skipRoom)
+        {
+            // The generation is not actually done as we need to fill in the rest of the grid but for now this stops it going out
+            generationDone = true;
+        } else if(transform.position.y < -15)
+        {
+            generationDone = true;
+            transform.position = lastPosition;
+            Collider2D[] lastRooms = Physics2D.OverlapCircleAll(transform.position, 3);
+            Destroy(lastRooms[1].gameObject);
+            roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+        }
+
         if (!skipRoom)
         {
+            //GameObject room = Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
+
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
         } else
         {
@@ -152,8 +196,10 @@ public class LevelGenerator : MonoBehaviour
     {
         if (rooms[lastRoomIndex].CompareTag("BottomExit"))
         {
+            Debug.Log("Moving Down");
             Vector2 newPosition = new Vector2(transform.position.x, transform.position.y - moveAmount);
             transform.position = newPosition;
+            topRoomNeeded = true;
         }
         else
         {
@@ -176,11 +222,15 @@ public class LevelGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(currentTimeBetweenRooms <= 0)
+        if (currentTimeBetweenRooms <= 0 && !generationDone)
         {
             Move();
             currentTimeBetweenRooms = timeBetweenSpawns;
-        } else
+        } else if (generationDone)
+        {
+            //Destroy(gameObject);
+        }
+        else
         {
             currentTimeBetweenRooms -= Time.deltaTime;
         }

@@ -492,12 +492,14 @@ MonoBehaviour:
   - {fileID: 1198322767075839365, guid: daf9722c21f31c9459fa6ac15769ef2f, type: 3}
   - {fileID: 1854717420598350302, guid: 04e0481e2080ec4438ed45f0086f7257, type: 3}
   - {fileID: 2682907625850496950, guid: e88d15055f799d043b1df5e893211374, type: 3}
+  - {fileID: 6253334982795650426, guid: 9b6440d78da396c4b9238d51920f32e3, type: 3}
   moveAmount: 10
-  timeBetweenSpawns: 0.25
+  timeBetweenSpawns: 0.5
   maxX: 5
   minX: -25
-  layer: 1
+  roomIndex: 0
   skipRoom: 0
+  bottomRoomIndices: 
 --- !u!58 &879068366
 CircleCollider2D:
   m_ObjectHideFlags: 0
