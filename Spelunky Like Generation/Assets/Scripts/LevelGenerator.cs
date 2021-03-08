@@ -13,6 +13,7 @@ public class LevelGenerator : MonoBehaviour
     public float timeBetweenSpawns = 0.25f;
     public float maxX = 5f;
     public float minX = -25f;
+    public List<int> roomIndexList = new List<int>();
 
     private int direction;
     [SerializeField]
@@ -203,6 +204,8 @@ public class LevelGenerator : MonoBehaviour
 
             Debug.Log("Final: " + rooms[roomIndex].name + roomIndex + " | " + direction);
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
+
+            roomIndexList.Add(roomIndex);
         } else
         {
             direction = Random.Range(1, 5);

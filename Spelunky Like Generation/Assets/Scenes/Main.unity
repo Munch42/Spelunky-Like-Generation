@@ -493,7 +493,7 @@ MonoBehaviour:
   - {fileID: 1854717420598350302, guid: 04e0481e2080ec4438ed45f0086f7257, type: 3}
   - {fileID: 2682907625850496950, guid: e88d15055f799d043b1df5e893211374, type: 3}
   moveAmount: 10
-  timeBetweenSpawns: 1
+  timeBetweenSpawns: 0.25
   maxX: 5
   minX: -25
   roomIndex: 0
