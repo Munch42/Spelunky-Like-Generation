@@ -13,7 +13,10 @@ public class LevelGenerator : MonoBehaviour
     public float timeBetweenSpawns = 0.25f;
     public float maxX = 5f;
     public float minX = -25f;
-    public int[,] roomIndexList;
+
+    public static int arrayXSize = 16;
+    public static int arrayYSize = 16;
+    public int[,] roomIndexList = new int[arrayXSize, arrayYSize];
 
     private int direction;
     [SerializeField]
@@ -40,6 +43,14 @@ public class LevelGenerator : MonoBehaviour
         int randomStartingRoom = Random.Range(0, startingRooms.Length);
         Instantiate(startingRooms[randomStartingRoom], transform.position, Quaternion.identity);
         roomIndex = randomStartingRoom;
+
+        for(int i = 0; i < rooms.Length; i++)
+        {
+            if (rooms[i].name == startingRooms[randomStartingRoom].name)
+            {
+                addToGrid(i);
+            }
+        }
 
         direction = Random.Range(1, 6);
 
@@ -205,13 +216,9 @@ public class LevelGenerator : MonoBehaviour
             Debug.Log("Final: " + rooms[roomIndex].name + roomIndex + " | " + direction);
             Instantiate(rooms[roomIndex], transform.position, Quaternion.identity);
 
-            /* # 3 2 1 0
-             * 0
-             * 1
-             * 2
-             * 3
-             */
-        } else
+            addToGrid(roomIndex);
+        }
+        else
         {
             direction = Random.Range(1, 5);
             skipRoom = false;
@@ -243,6 +250,48 @@ public class LevelGenerator : MonoBehaviour
                 transform.position = newPosition;
             }
         }
+    }
+
+    private void addToGrid(int specificRoomIndex)
+    {
+        /*X:  -25 -15 -5 5
+            *Y:  # 3 2 1 0
+            *15  0 
+            *5   1
+            *-5  2
+            *-15 3
+            */
+
+        float gridPosX = transform.position.x / 10;
+
+        if (gridPosX == 0.5)
+        {
+            gridPosX = 0;
+        }
+        else
+        {
+            gridPosX = Mathf.Ceil(Mathf.Abs(gridPosX));
+        }
+
+        float gridPosY = transform.position.y / 10;
+
+        if (gridPosY == 1.5)
+        {
+            gridPosY = 0;
+        }
+        else if (gridPosY == 0.5)
+        {
+            gridPosY = 1;
+        }
+        else
+        {
+            // This rounds the number which is either -0.5 or -1.5 minus 1 so it would equal 2 or 3 as it would round -1.5 to 2 and then -2.5 to 3
+            gridPosY = Mathf.Abs(Mathf.Ceil(gridPosY - 1));
+        }
+
+        // Debug.Log(rooms[specificRoomIndex].name + ": " + gridPosX + ", " + gridPosY);
+
+        roomIndexList[(int) gridPosX, (int) gridPosY] = specificRoomIndex;
     }
 
     // Update is called once per frame
