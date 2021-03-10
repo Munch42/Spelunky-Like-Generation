@@ -294,6 +294,38 @@ public class LevelGenerator : MonoBehaviour
         roomIndexList[(int) gridPosX, (int) gridPosY] = specificRoomIndex;
     }
 
+    private (float gridPosX, float gridPosY) getCurrentGridPos()
+    {
+        float gridPosX = transform.position.x / 10;
+
+        if (gridPosX == 0.5)
+        {
+            gridPosX = 0;
+        }
+        else
+        {
+            gridPosX = Mathf.Ceil(Mathf.Abs(gridPosX));
+        }
+
+        float gridPosY = transform.position.y / 10;
+
+        if (gridPosY == 1.5)
+        {
+            gridPosY = 0;
+        }
+        else if (gridPosY == 0.5)
+        {
+            gridPosY = 1;
+        }
+        else
+        {
+            // This rounds the number which is either -0.5 or -1.5 minus 1 so it would equal 2 or 3 as it would round -1.5 to 2 and then -2.5 to 3
+            gridPosY = Mathf.Abs(Mathf.Ceil(gridPosY - 1));
+        }
+
+        return (gridPosX, gridPosY);
+    }
+
     // Update is called once per frame
     void Update()
     {
