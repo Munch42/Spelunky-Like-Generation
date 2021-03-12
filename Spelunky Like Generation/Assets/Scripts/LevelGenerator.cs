@@ -151,7 +151,18 @@ public class LevelGenerator : MonoBehaviour
             transform.position = lastPosition;
             Collider2D[] lastRooms = Physics2D.OverlapCircleAll(transform.position, 3);
             Destroy(lastRooms[1].gameObject);
-            roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+            
+            // This checks if the room above has a bottom exit. If it does, it means we need a top and bottom exit for this one.
+            (int gridPosX, int gridPosY) = getCurrentGridPos();
+            if (rooms[roomIndexList[gridPosX, gridPosY - 1]].CompareTag("BottomExit"))
+            {
+                roomIndex = topBottomRoomIndices[Random.Range(0, topBottomRoomIndices.Count)];
+            }
+            else
+            {
+                roomIndex = bottomRoomIndices[Random.Range(0, bottomRoomIndices.Count)];
+            }
+
             direction = 6;
             Debug.Log("5: " + roomIndex + " | " + direction);
         }
@@ -289,12 +300,12 @@ public class LevelGenerator : MonoBehaviour
             gridPosY = Mathf.Abs(Mathf.Ceil(gridPosY - 1));
         }
 
-        // Debug.Log(rooms[specificRoomIndex].name + ": " + gridPosX + ", " + gridPosY);
+         //Debug.Log(rooms[specificRoomIndex].name + ": " + gridPosX + ", " + gridPosY);
 
         roomIndexList[(int) gridPosX, (int) gridPosY] = specificRoomIndex;
     }
 
-    private (float gridPosX, float gridPosY) getCurrentGridPos()
+    private (int gridPosX, int gridPosY) getCurrentGridPos()
     {
         float gridPosX = transform.position.x / 10;
 
@@ -323,7 +334,7 @@ public class LevelGenerator : MonoBehaviour
             gridPosY = Mathf.Abs(Mathf.Ceil(gridPosY - 1));
         }
 
-        return (gridPosX, gridPosY);
+        return ((int) gridPosX, (int) gridPosY);
     }
 
     // Update is called once per frame
